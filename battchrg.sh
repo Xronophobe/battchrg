@@ -2,10 +2,10 @@
 
 
 # https://github.com/solvskogen-frostlands/battchrg
-#
+# 
 # This script provides information about your remaining battery capacity while 
 # not consuming too much space. It has been designed for being included in your
-# shell prompt.
+# shell prompt on your Apple OS X system.
 # The point is, using only one character for this purpose. So I ended up with
 # this solution: the only number provided is going to be the number
 # representing the tenths of the remaining battery capacity percentage. Its
