@@ -18,11 +18,11 @@
 | CHARACTERS:          |
 |        F  | Battery is fully charged, or above 95% |
 |    0 - 9  | This number represent tenths of the remaining capacity (in %) |
-|    green  | Remaining capacity ends in either 0, 9, 8 or 7 |
+|    green  | Remaining capacity ends in either 9, 8 or 7 |
 |   yellow  | Remaining capacity ends in either 6, 5 or 4 |
-|      red  | Remaining capacity ends in either 3, 2, or 1 |
+|      red  | Remaining capacity ends in either 3, 2, 1 or 0 |
 |        E  | Battery has dropped below 20%. Becomes black if remaining |
-|             capacity percentage ends in 2, 1 or 0. Blinking at and below 10% |
+|             capacity percentage ends in 3, 2, 1 or 0. Blinking at and below 10% |
 |BACKGROUND: |
 |     blue  | Battery is charging |
 |    white  | Battery is discharging |
