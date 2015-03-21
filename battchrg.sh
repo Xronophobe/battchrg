@@ -9,36 +9,31 @@ function get_battery_data {
     echo ''
 }
 
-function print_tens_color {
-    #echo -e "${esc}$2$3$4m${remaining_tens}${cn0}"
-    echo -e "${text_style}m${remaining_tens}${cn0}"
-}
 
 function display_battery {
-    echo -e "${text_style}m pina ${cn0}"
+    echo -e "${text_style}m${remaining_tens}${cn0}"
 }
 
 #defining colors
 esc='\033['
 cn0="${esc}0m"
-#general styling patterns
-#autocolor="${esc}${styl}${fg}${bg}"
 
 #text style
 n_bl="5;" #blinking
 n_bo="1;" #bold
 
 #text background
-t7_9="47;"
-t3_6="46;"
+t7_9="40;"
+t3_6="40;"
 t0_2="41;"
 
 #text foreground
-o12="31;"
-o34="35;"
-o56="33;"
-o78="34;"
-o90="32;"
+oHI="32;"
+oMH="36;" #34- blue, 36- cyan
+oMI="37;"
+oML="33;"
+oLO="31;"
+oLL="30;"
 
 #storing system_profiler output:
 sysprofiler=$(system_profiler SPPowerDataType\
@@ -61,29 +56,40 @@ remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
 remaining=$1
 remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
 remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
-      
-echo $remaining_tens-$remaining_ones
 
 text_style="${esc}${n_bo}"
 
-if [ $remaining_tens -ge 7 ]; then
-    text_style="${text_style}${t7_9}"
+if [ $remaining_tens -gt 2 ]; then 
+#    if [ $remaining_tens -ge 7 ]; then
+#        text_style="${text_style}${t7_9}"
+#    else
+#        text_style="${text_style}${t3_6}"
+#    fi
+
     case $remaining_ones in
-    #    9|0) echo -e "${c09}$remaining_tens${cn0}";;
-        9|0) print_tens_color ${c09};;
-        7|8) print_tens_color ${c87};;
-        5|6) print_tens_color ${c65};;
-        3|4) print_tens_color ${c43};;
-        1|2) print_tens_color ${c21};;
+        8|9) text_style="${text_style}${oHI}";;
+        6|7) text_style="${text_style}${oMH}";;
+        4|5) text_style="${text_style}${oMI}";;
+        2|3) text_style="${text_style}${oML}";;
+        0|1) text_style="${text_style}${oLO}";;
     esac
-elif [ $remaining_tens -gt 2 ]; then 
-    echo "greater than 29 but less than 70"
-    text_style="${text_style}${t3_6}"
-elif [ $remaining_tens -eq 2 ]; then
-    echo "29 and down"
-    text_style="${text_style}${t0_2}"
+
+    display_battery $text_style
 else
-    text_style="${text_style}${t0_2}${n_bl}"
+    text_style="${text_style}${t0_2}"
+    if [ $remaining_tens -lt 2 ]; then
+        text_style="${text_style}${n_bl}"
+    fi
+    
+
+    case $remaining_ones in
+        8|9) text_style="${text_style}${oHI}";;
+        6|7) text_style="${text_style}${oMH}";;
+        4|5) text_style="${text_style}${oMI}";;
+        2|3) text_style="${text_style}${oML}";;
+        0|1) text_style="${text_style}${oLL}";;
+    esac
+
     display_battery $text_style
 fi
 
