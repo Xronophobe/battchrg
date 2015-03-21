@@ -5,14 +5,18 @@
 # 
 
 function print_tens_color {
-    echo -e "$1${remaining_tens}${cn0}"
+    echo -e "$1$2$3$4${remaining_tens}${cn0}"
 }
 
 
 #defining colors
 esc='\033['
 
+#general styling patterns
+autocolor="${esc}${styl}${fg}${bg}"
+
 c09="${esc}0;32m"
+
 c87="${esc}0;36m"
 c65="${esc}1;33m"
 c43="${esc}0;33m"
@@ -23,13 +27,21 @@ cn0="${esc}0m"
 #ps -p $$
 
 #storing system_profiler output:
-sysprofiler="$(system_profiler SPPowerDataType|grep -A4 'Charge Information')"
+sysprofiler=$(system_profiler SPPowerDataType\
+            |grep -A4 'Charge Information'\
+            )
 
 #current capacity in mAh:
-currcap=$(echo "${sysprofiler}"|grep 'Remaining'|awk '{print $4}')
+currcap=$(echo "${sysprofiler}"\
+        |grep 'Remaining'\
+        |awk '{print $4}'\
+        )
 
 #full capacity in mAh:
-fullcap=$(echo "${sysprofiler}"|grep 'Full Charge'|awk '{print $5}')
+fullcap=$(echo "${sysprofiler}"\
+        |grep 'Full Charge'\
+        |awk '{print $5}'\
+        )
 
 remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
 remaining=$1
