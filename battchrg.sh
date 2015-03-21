@@ -4,27 +4,41 @@
 # https://github.com/solvskogen-frostlands/battchrg
 # 
 
-function print_tens_color {
-    echo -e "$1$2$3$4${remaining_tens}${cn0}"
+function get_battery_data {
+    #TODO
+    echo ''
 }
 
+function print_tens_color {
+    #echo -e "${esc}$2$3$4m${remaining_tens}${cn0}"
+    echo -e "${text_style}m${remaining_tens}${cn0}"
+}
+
+function display_battery {
+    echo -e "${text_style}m pina ${cn0}"
+}
 
 #defining colors
 esc='\033['
-
-#general styling patterns
-autocolor="${esc}${styl}${fg}${bg}"
-
-c09="${esc}0;32m"
-
-c87="${esc}0;36m"
-c65="${esc}1;33m"
-c43="${esc}0;33m"
-c21="${esc}0;31m"
 cn0="${esc}0m"
+#general styling patterns
+#autocolor="${esc}${styl}${fg}${bg}"
 
-#echo -e "\033[1;31;42;mERROR: \033[0m\033[31;40mSome fuck.\033[0m"
-#ps -p $$
+#text style
+n_bl="5;" #blinking
+n_bo="1;" #bold
+
+#text background
+t7_9="47;"
+t3_6="46;"
+t0_2="41;"
+
+#text foreground
+o12="31;"
+o34="35;"
+o56="33;"
+o78="34;"
+o90="32;"
 
 #storing system_profiler output:
 sysprofiler=$(system_profiler SPPowerDataType\
@@ -48,14 +62,12 @@ remaining=$1
 remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
 remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
       
-#echo $remaining
-#bgcolor=$(tput sgr 7)
-#echo $bgcolor$remaining_tens-$remaining_ones
-
-
 echo $remaining_tens-$remaining_ones
 
-if [ $remaining_tens -gt 2 ]; then
+text_style="${esc}${n_bo}"
+
+if [ $remaining_tens -ge 7 ]; then
+    text_style="${text_style}${t7_9}"
     case $remaining_ones in
     #    9|0) echo -e "${c09}$remaining_tens${cn0}";;
         9|0) print_tens_color ${c09};;
@@ -64,6 +76,14 @@ if [ $remaining_tens -gt 2 ]; then
         3|4) print_tens_color ${c43};;
         1|2) print_tens_color ${c21};;
     esac
-else
+elif [ $remaining_tens -gt 2 ]; then 
+    echo "greater than 29 but less than 70"
+    text_style="${text_style}${t3_6}"
+elif [ $remaining_tens -eq 2 ]; then
     echo "29 and down"
+    text_style="${text_style}${t0_2}"
+else
+    text_style="${text_style}${t0_2}${n_bl}"
+    display_battery $text_style
 fi
+
