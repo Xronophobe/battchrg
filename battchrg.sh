@@ -5,7 +5,7 @@
 # 
 
 function print_tens_color {
-    echo "$1${remaining_tens}${cn0}"
+    echo -e "$1${remaining_tens}${cn0}"
 }
 
 
@@ -17,6 +17,7 @@ c43='\033[0;33m'
 c21='\033[0;31m'
 cn0='\033[0m'
 
+#echo -e "\033[1;31;42;mERROR: \033[0m\033[31;40mSome fuck.\033[0m"
 #ps -p $$
 
 #storing system_profiler output:
