@@ -17,7 +17,7 @@ c43='\033[0;33m'
 c21='\033[0;31m'
 cn0='\033[0m'
 
-ps -p $$
+#ps -p $$
 
 #storing system_profiler output:
 sysprofiler="$(system_profiler SPPowerDataType|grep -A4 'Charge Information')"
@@ -40,16 +40,15 @@ remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
 
 echo $remaining_tens-$remaining_ones
 
-case $remaining_ones in
-#    9|0) echo -e "${c09}$remaining_tens${cn0}";;
-    9|0) print_tens_color ${c09};;
-    7|8) print_tens_color ${c87};;
-    5|6) print_tens_color ${c65};;
-    3|4) print_tens_color ${c43};;
-    1|2) print_tens_color ${c21};;
-esac
-
-if  [ $remaining_tens -le 2 ] ; then
+if [ $remaining_tens -gt 2 ]; then
+    case $remaining_ones in
+    #    9|0) echo -e "${c09}$remaining_tens${cn0}";;
+        9|0) print_tens_color ${c09};;
+        7|8) print_tens_color ${c87};;
+        5|6) print_tens_color ${c65};;
+        3|4) print_tens_color ${c43};;
+        1|2) print_tens_color ${c21};;
+    esac
+else
     echo "29 and down"
 fi
-
