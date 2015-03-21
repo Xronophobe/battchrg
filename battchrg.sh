@@ -10,12 +10,14 @@ function print_tens_color {
 
 
 #defining colors
-c09='\033[0;32m'
-c87='\033[0;36m'
-c65='\033[1;33m'
-c43='\033[0;33m'
-c21='\033[0;31m'
-cn0='\033[0m'
+esc='\033['
+
+c09="${esc}0;32m"
+c87="${esc}0;36m"
+c65="${esc}1;33m"
+c43="${esc}0;33m"
+c21="${esc}0;31m"
+cn0="${esc}0m"
 
 #echo -e "\033[1;31;42;mERROR: \033[0m\033[31;40mSome fuck.\033[0m"
 #ps -p $$
