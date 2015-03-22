@@ -29,39 +29,55 @@ oLMH="36;"
 oLLO="37;"
 
 
-get_battery_data() {
-    remaining=0
-
+function get_battery_data {
     #storing system_profiler output:
-    sysprofiler=$(system_profiler SPPowerDataType\
+    battery_data=$(system_profiler SPPowerDataType\
                 |grep -A4 'Charge Information'\
                 )
+    re="(Remaining \(mAh\): )[1-9]{1,4}"
+    if [[ $battery_data =~ $re ]]; then
+        remaining=${BASH_REMATCH[0]:17}
+    fi
+    echo $remaining
+}
 
+get_battery_data
+
+get_current_capacity(){
     #current capacity in mAh:
     currcap=$(echo "${sysprofiler}"\
             |grep 'Remaining'\
             |awk '{print $4}'\
             )
 
+    return $currcap
+}
+
+get_full_capacity(){
     #full capacity in mAh:
     fullcap=$(echo "${sysprofiler}"\
             |grep 'Full Charge'\
             |awk '{print $5}'\
             )
-    echo "$currcap $fullcap $sysprofiler"
 
+    return $fullcap
+}
+
+function get_remaining {
     remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
 
-    return $remaining
+    echo "$remaining"
 }
 
 function display_battery {
     echo -e "${text_style}m${remaining_tens}${cn0}"
 }
 
+get_battery_data
+remaining=$?
+remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
+remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
 
-    remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
-    remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
 text_style="${esc}${n_bo}"
 
 if [ $remaining_tens -gt 2 ]; then 
