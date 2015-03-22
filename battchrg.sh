@@ -29,11 +29,13 @@ t0_2="41;"
 
 #text foreground
 oHI="32;"
-oMH="36;" #34- blue, 36- cyan
+oMH="34;"
 oMI="37;"
 oML="33;"
 oLO="31;"
-oLL="30;"
+
+oLMH="36;"
+oLLO="37;"
 
 #storing system_profiler output:
 sysprofiler=$(system_profiler SPPowerDataType\
@@ -53,7 +55,6 @@ fullcap=$(echo "${sysprofiler}"\
         )
 
 remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
-remaining=$1
 remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
 remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
 
@@ -81,13 +82,12 @@ else
         text_style="${text_style}${n_bl}"
     fi
     
-
     case $remaining_ones in
         8|9) text_style="${text_style}${oHI}";;
-        6|7) text_style="${text_style}${oMH}";;
+        6|7) text_style="${text_style}${oLMH}";;
         4|5) text_style="${text_style}${oMI}";;
         2|3) text_style="${text_style}${oML}";;
-        0|1) text_style="${text_style}${oLL}";;
+        0|1) text_style="${text_style}${oLLO}";;
     esac
 
     display_battery $text_style
