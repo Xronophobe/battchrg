@@ -32,42 +32,21 @@ oLLO="37;"
 function get_battery_data {
     #storing system_profiler output:
     battery_data=$(system_profiler SPPowerDataType\
-                |grep -A4 'Charge Information'\
+                |grep -A3 'Charge Remaining'
                 )
-    re="(Remaining \(mAh\): )[1-9]{1,4}"
-    if [[ $battery_data =~ $re ]]; then
-        remaining=${BASH_REMATCH[0]:17}
-    fi
-    echo $remaining
+    
+    re="([0-9]{2,4})"
+
+    for w in ${battery_data}; do
+        if [[ $w =~ $re ]]; then
+            echo first ${BASH_REMATCH[1]} #first perens
+        fi
+    done
+
+    echo -e "$battery_data"
 }
 
 get_battery_data
-
-get_current_capacity(){
-    #current capacity in mAh:
-    currcap=$(echo "${sysprofiler}"\
-            |grep 'Remaining'\
-            |awk '{print $4}'\
-            )
-
-    return $currcap
-}
-
-get_full_capacity(){
-    #full capacity in mAh:
-    fullcap=$(echo "${sysprofiler}"\
-            |grep 'Full Charge'\
-            |awk '{print $5}'\
-            )
-
-    return $fullcap
-}
-
-function get_remaining {
-    remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
-
-    echo "$remaining"
-}
 
 function display_battery {
     echo -e "${text_style}m${remaining_tens}${cn0}"
