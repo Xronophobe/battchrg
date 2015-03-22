@@ -4,14 +4,11 @@
 # https://github.com/solvskogen-frostlands/battchrg
 # 
 
+text_style="${esc}${n_bo}"
 
 #defining colors
 esc='\033['
 cn0="${esc}0m"
-
-#text style
-n_bl="5;" #blinking
-n_bo="1;" #bold
 
 #text background
 t7_9="40;"
@@ -28,36 +25,51 @@ oLO="31;"
 oLMH="36;"
 oLLO="37;"
 
+#text style
+n_bl="5;" #blinking
+n_bo="1;" #bold
 
-function get_battery_data {
+remaining=0
+currcap=0
+fullcap=0
+
+battery_data=$NULL
+get_battery_data() {
+    re=''
     #storing system_profiler output:
     battery_data=$(system_profiler SPPowerDataType\
                 |grep -A3 'Charge Remaining'
                 )
-    
-    re="([0-9]{2,4})"
 
-    for w in ${battery_data}; do
-        if [[ $w =~ $re ]]; then
-            echo first ${BASH_REMATCH[1]} #first perens
+    re="Full( )([[:alpha:]_]+( )){2}(\(mAh\)):( )[0-9]{1,4}"
+    if [[ $battery_data =~ $re ]]; then
+        fullcap=${BASH_REMATCH[0]}
+
+        if [[ $fullcap =~ [0-9]{1,4} ]]; then
+            fullcap=${BASH_REMATCH[0]}
         fi
-    done
+    fi
+    
+    re="Remaining( )(\(mAh\)):( )[0-9]{1,4}"
+    if [[ $test =~ $re ]]; then
+        currcap=${BASH_REMATCH[0]}
 
-    echo -e "$battery_data"
+        if [[ $currcap =~ [0-9]{1,4} ]]; then
+           currcap=${BASH_REMATCH[0]} 
+        fi
+    fi
+
+    #echo remaining 10.0 format 
 }
 
-get_battery_data
+#function set_color
+# put switch-cases here from below
+# text_style variable is already declared above
 
 function display_battery {
-    echo -e "${text_style}m${remaining_tens}${cn0}"
+    #set_color
+    echo -e "${text_style}m$1${cn0}"
 }
-
-get_battery_data
-remaining=$?
-remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
-remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
-
-text_style="${esc}${n_bo}"
 
 if [ $remaining_tens -gt 2 ]; then 
 #    if [ $remaining_tens -ge 7 ]; then
