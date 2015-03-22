@@ -4,15 +4,6 @@
 # https://github.com/solvskogen-frostlands/battchrg
 # 
 
-function get_battery_data {
-    #TODO
-    echo ''
-}
-
-
-function display_battery {
-    echo -e "${text_style}m${remaining_tens}${cn0}"
-}
 
 #defining colors
 esc='\033['
@@ -37,27 +28,40 @@ oLO="31;"
 oLMH="36;"
 oLLO="37;"
 
-#storing system_profiler output:
-sysprofiler=$(system_profiler SPPowerDataType\
-            |grep -A4 'Charge Information'\
+
+get_battery_data() {
+    remaining=0
+
+    #storing system_profiler output:
+    sysprofiler=$(system_profiler SPPowerDataType\
+                |grep -A4 'Charge Information'\
+                )
+
+    #current capacity in mAh:
+    currcap=$(echo "${sysprofiler}"\
+            |grep 'Remaining'\
+            |awk '{print $4}'\
             )
 
-#current capacity in mAh:
-currcap=$(echo "${sysprofiler}"\
-        |grep 'Remaining'\
-        |awk '{print $4}'\
-        )
+    #full capacity in mAh:
+    fullcap=$(echo "${sysprofiler}"\
+            |grep 'Full Charge'\
+            |awk '{print $5}'\
+            )
+    echo "$currcap $fullcap $sysprofiler"
 
-#full capacity in mAh:
-fullcap=$(echo "${sysprofiler}"\
-        |grep 'Full Charge'\
-        |awk '{print $5}'\
-        )
+    remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
 
-remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
-remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
-remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
+    return $remaining
+}
 
+function display_battery {
+    echo -e "${text_style}m${remaining_tens}${cn0}"
+}
+
+
+    remaining_tens=$(echo $remaining|awk -F'.' '{print $1}')
+    remaining_ones=$(echo $remaining|awk -F'.' '{print $2}')
 text_style="${esc}${n_bo}"
 
 if [ $remaining_tens -gt 2 ]; then 
