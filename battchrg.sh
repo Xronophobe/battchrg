@@ -1,10 +1,8 @@
 #!/bin/bash
-
 #
 # https://github.com/solvskogen-frostlands/battchrg
 # 
 
-text_style="${esc}${n_bo}"
 
 #defining colors
 esc='\033['
@@ -22,21 +20,17 @@ oMI="37;"
 oML="33;"
 oLO="31;"
 
-oLMH="36;"
-oLLO="37;"
-
 #text style
 n_bl="5;" #blinking
 n_bo="1;" #bold
 
-remaining=0
-currcap=0
-fullcap=0
+#script-wide variables
+batt_tens=0
+batt_ones=0
+is_charging=0
 
-battery_data=$NULL
+
 get_battery_data() {
-    re=''
-    #storing system_profiler output:
     battery_data=$(system_profiler SPPowerDataType\
                 |grep -A3 'Charge Remaining'
                 )
@@ -51,56 +45,47 @@ get_battery_data() {
     fi
     
     re="Remaining( )(\(mAh\)):( )[0-9]{1,4}"
-    if [[ $test =~ $re ]]; then
+    if [[ $battery_data =~ $re ]]; then
         currcap=${BASH_REMATCH[0]}
-
         if [[ $currcap =~ [0-9]{1,4} ]]; then
            currcap=${BASH_REMATCH[0]} 
         fi
     fi
-
-    #echo remaining 10.0 format 
+    
+    remaining=$(awk "BEGIN {printf \"%.1f\", 10*${currcap}/${fullcap}}")
+    echo $remaining 
 }
 
-#function set_color
-# put switch-cases here from below
-# text_style variable is already declared above
 
-function display_battery {
-    #set_color
-    echo -e "${text_style}m$1${cn0}"
-}
+function set_text_color {
+    text_style="${esc}${n_bo}"
 
-if [ $remaining_tens -gt 2 ]; then 
-#    if [ $remaining_tens -ge 7 ]; then
-#        text_style="${text_style}${t7_9}"
-#    else
-#        text_style="${text_style}${t3_6}"
-#    fi
+    if [ $1 -le 2 ]; then 
+        text_style="${text_style}${t0_2}"
+        oMH="36;"
+        oLO="30;"
+        if [ $1 -lt 2 ]; then
+            text_style="${text_style}${n_bl}"
+        fi
+    fi
 
-    case $remaining_ones in
+    case $2 in
         8|9) text_style="${text_style}${oHI}";;
         6|7) text_style="${text_style}${oMH}";;
         4|5) text_style="${text_style}${oMI}";;
         2|3) text_style="${text_style}${oML}";;
         0|1) text_style="${text_style}${oLO}";;
     esac
+}
 
-    display_battery $text_style
-else
-    text_style="${text_style}${t0_2}"
-    if [ $remaining_tens -lt 2 ]; then
-        text_style="${text_style}${n_bl}"
-    fi
-    
-    case $remaining_ones in
-        8|9) text_style="${text_style}${oHI}";;
-        6|7) text_style="${text_style}${oLMH}";;
-        4|5) text_style="${text_style}${oMI}";;
-        2|3) text_style="${text_style}${oML}";;
-        0|1) text_style="${text_style}${oLLO}";;
-    esac
 
-    display_battery $text_style
-fi
+function display_battery {
+    batt_tens=$(echo $1|cut -f1 -d. )
+    batt_ones=$(echo $1|cut -f2 -d. )
 
+    set_text_color $batt_tens $batt_ones
+    echo -e "${text_style}m$batt_tens${cn0}"
+}
+
+display_battery $( get_battery_data )
+#display_battery $1
