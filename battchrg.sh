@@ -1,8 +1,5 @@
 #!/bin/bash
 #
-# https://github.com/solvskogen-frostlands/battchrg
-# 
-
 
 #defining colors
 esc='\033['
